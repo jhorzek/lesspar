@@ -1,0 +1,1520 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../07-GLMNET/">
+      
+      
+        <link rel="next" href="../09-fitResults/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+    
+    
+      
+        <title>ISTA optimizer - lesstimate</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ista" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="lesstimate" class="md-header__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            lesstimate
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ISTA optimizer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="lesstimate" class="md-nav__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    lesstimate
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-getting-started/" class="md-nav__link">
+        Regularizing models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-The%20Optimizer%20Design/" class="md-nav__link">
+        Optimizer design
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Code Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Code Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Model/" class="md-nav__link">
+        Model
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-lesstimate_types/" class="md-nav__link">
+        lesstimate types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Penalty%20type/" class="md-nav__link">
+        penalty types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-GLMNET/" class="md-nav__link">
+        GLMNET optimizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          ISTA optimizer
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        ISTA optimizer
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fitista" class="md-nav__link">
+    fitIsta
+  </a>
+  
+    <nav class="md-nav" aria-label="fitIsta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ista_1" class="md-nav__link">
+    ista
+  </a>
+  
+    <nav class="md-nav" aria-label="ista">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1_1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2_1" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#controldefault" class="md-nav__link">
+    controlDefault
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimizer settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convcritinnerista" class="md-nav__link">
+    convCritInnerIsta
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stepsizeinheritance" class="md-nav__link">
+    stepSizeInheritance
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#penalties" class="md-nav__link">
+    Penalties
+  </a>
+  
+    <nav class="md-nav" aria-label="Penalties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cappedl1" class="md-nav__link">
+    CappedL1
+  </a>
+  
+    <nav class="md-nav" aria-label="CappedL1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterscappedl1" class="md-nav__link">
+    tuningParametersCappedL1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorcappedl1" class="md-nav__link">
+    proximalOperatorCappedL1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltycappedl1" class="md-nav__link">
+    penaltyCappedL1
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lasso" class="md-nav__link">
+    lasso
+  </a>
+  
+    <nav class="md-nav" aria-label="lasso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenet" class="md-nav__link">
+    tuningParametersEnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorlasso" class="md-nav__link">
+    proximalOperatorLasso
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylasso" class="md-nav__link">
+    penaltyLASSO
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsp" class="md-nav__link">
+    LSP
+  </a>
+  
+    <nav class="md-nav" aria-label="LSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterslsp" class="md-nav__link">
+    tuningParametersLSP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorlsp" class="md-nav__link">
+    proximalOperatorLSP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylsp" class="md-nav__link">
+    penaltyLSP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    MCP
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmcp" class="md-nav__link">
+    tuningParametersMcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatormcp" class="md-nav__link">
+    proximalOperatorMcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymcp" class="md-nav__link">
+    penaltyMcp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixed-penalty" class="md-nav__link">
+    Mixed penalty
+  </a>
+  
+    <nav class="md-nav" aria-label="Mixed penalty">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmixedpenalty" class="md-nav__link">
+    tuningParametersMixedPenalty
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatormixedpenalty" class="md-nav__link">
+    proximalOperatorMixedPenalty
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymixedpenalty" class="md-nav__link">
+    penaltyMixedPenalty
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ridge" class="md-nav__link">
+    Ridge
+  </a>
+  
+    <nav class="md-nav" aria-label="Ridge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenet_1" class="md-nav__link">
+    tuningParametersEnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyridge" class="md-nav__link">
+    penaltyRidge
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scad" class="md-nav__link">
+    SCAD
+  </a>
+  
+    <nav class="md-nav" aria-label="SCAD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersscad" class="md-nav__link">
+    tuningParametersScad
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorscad" class="md-nav__link">
+    proximalOperatorScad
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyscad" class="md-nav__link">
+    penaltyScad
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-fitResults/" class="md-nav__link">
+        fitResults class
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-BFGS/" class="md-nav__link">
+        BFGS optimizer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fitista" class="md-nav__link">
+    fitIsta
+  </a>
+  
+    <nav class="md-nav" aria-label="fitIsta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ista_1" class="md-nav__link">
+    ista
+  </a>
+  
+    <nav class="md-nav" aria-label="ista">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1_1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2_1" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#controldefault" class="md-nav__link">
+    controlDefault
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimizer settings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#convcritinnerista" class="md-nav__link">
+    convCritInnerIsta
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stepsizeinheritance" class="md-nav__link">
+    stepSizeInheritance
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#penalties" class="md-nav__link">
+    Penalties
+  </a>
+  
+    <nav class="md-nav" aria-label="Penalties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cappedl1" class="md-nav__link">
+    CappedL1
+  </a>
+  
+    <nav class="md-nav" aria-label="CappedL1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterscappedl1" class="md-nav__link">
+    tuningParametersCappedL1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorcappedl1" class="md-nav__link">
+    proximalOperatorCappedL1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltycappedl1" class="md-nav__link">
+    penaltyCappedL1
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lasso" class="md-nav__link">
+    lasso
+  </a>
+  
+    <nav class="md-nav" aria-label="lasso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenet" class="md-nav__link">
+    tuningParametersEnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorlasso" class="md-nav__link">
+    proximalOperatorLasso
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylasso" class="md-nav__link">
+    penaltyLASSO
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsp" class="md-nav__link">
+    LSP
+  </a>
+  
+    <nav class="md-nav" aria-label="LSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterslsp" class="md-nav__link">
+    tuningParametersLSP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorlsp" class="md-nav__link">
+    proximalOperatorLSP
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylsp" class="md-nav__link">
+    penaltyLSP
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    MCP
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmcp" class="md-nav__link">
+    tuningParametersMcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatormcp" class="md-nav__link">
+    proximalOperatorMcp
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymcp" class="md-nav__link">
+    penaltyMcp
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixed-penalty" class="md-nav__link">
+    Mixed penalty
+  </a>
+  
+    <nav class="md-nav" aria-label="Mixed penalty">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmixedpenalty" class="md-nav__link">
+    tuningParametersMixedPenalty
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatormixedpenalty" class="md-nav__link">
+    proximalOperatorMixedPenalty
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymixedpenalty" class="md-nav__link">
+    penaltyMixedPenalty
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ridge" class="md-nav__link">
+    Ridge
+  </a>
+  
+    <nav class="md-nav" aria-label="Ridge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenet_1" class="md-nav__link">
+    tuningParametersEnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyridge" class="md-nav__link">
+    penaltyRidge
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scad" class="md-nav__link">
+    SCAD
+  </a>
+  
+    <nav class="md-nav" aria-label="SCAD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersscad" class="md-nav__link">
+    tuningParametersScad
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proximaloperatorscad" class="md-nav__link">
+    proximalOperatorScad
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyscad" class="md-nav__link">
+    penaltyScad
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="ista">ISTA</h1>
+<p>The implementation of ista follows that outlined in
+Beck, A., &amp; Teboulle, M. (2009). A Fast Iterative Shrinkage-Thresholding
+Algorithm for Linear Inverse Problems. SIAM Journal on Imaging Sciences, 2(1),
+183–202. https://doi.org/10.1137/080716542
+see Remark 3.1 on p. 191 (ISTA with backtracking)</p>
+<p>GIST can be found in
+Gong, P., Zhang, C., Lu, Z., Huang, J., &amp; Ye, J. (2013).
+A General Iterative Shrinkage and Thresholding Algorithm for Non-convex
+Regularized Optimization Problems. Proceedings of the 30th International
+Conference on Machine Learning, 28(2)(2), 37–45.</p>
+<h2 id="fitista">fitIsta</h2>
+<p>We provide two optimizer interfaces: One uses a combination of arma::rowvec and less::stringVector for starting values and parameter labels respectively. This interface is consistent with the fit and gradient function of the <code>less::model</code>-class. Alternatively, a numericVector can be passed to the optimizers. This design is rooted in the use of Rcpp::NumericVectors that combine values and labels similar to an R vector. Thus, interfacing to this second function call can be easier when coming from R.</p>
+<h3 id="version-1">Version 1</h3>
+<ul>
+<li><strong>param</strong> userModel: your model. Must inherit from less::model!</li>
+<li><strong>param</strong> startingValues: numericVector with initial starting values. This
+ vector can have names.</li>
+<li><strong>param</strong> penalty: vector with strings indicating the penalty for each parameter.
+ Currently supported are "none", "cappedL1", "lasso", "lsp", "mcp", and "scad".
+ (e.g., {"none", "scad", "scad", "lasso", "none"}). If only one value is provided,
+ the same penalty will be applied to every parameter!</li>
+<li><strong>param</strong> lambda: lambda tuning parameter values. One lambda value for each parameter.
+ If only one value is provided, this value will be applied to each parameter.
+ Important: The the function will <em>not</em> loop over these values but assume that you
+ may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> theta: theta tuning parameter values. One theta value for each parameter
+ If only one value is provided, this value will be applied to each parameter.
+ Not all penalties use theta.
+ Important: The the function will <em>not</em> loop over these values but assume that you
+ may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> controlOptimizer: option to change the optimizer settings</li>
+<li><strong>param</strong> verbose: should additional information be printed? If set &gt; 0, additional
+ information will be provided. Highly recommended for initial runs. Note that
+ the optimizer itself has a separate verbose argument that can be used to print
+ information on each iteration. This can be set with the controlOptimizer - argument.</li>
+<li><strong>return</strong> fitResults</li>
+</ul>
+<h3 id="version-2">Version 2</h3>
+<ul>
+<li><strong>param</strong> userModel: your model. Must inherit from less::model!</li>
+<li><strong>param</strong> startingValues: an arma::rowvec numeric vector with starting values</li>
+<li><strong>param</strong> parameterLabels: a less::stringVector with labels for parameters</li>
+<li><strong>param</strong> penalty: vector with strings indicating the penalty for each parameter.
+Currently supported are "none", "cappedL1", "lasso", "lsp", "mcp", and "scad".
+(e.g., {"none", "scad", "scad", "lasso", "none"}). If only one value is provided,
+the same penalty will be applied to every parameter!</li>
+<li><strong>param</strong> lambda: lambda tuning parameter values. One lambda value for each parameter.
+If only one value is provided, this value will be applied to each parameter.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> theta: theta tuning parameter values. One theta value for each parameter
+If only one value is provided, this value will be applied to each parameter.
+Not all penalties use theta.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> controlOptimizer: option to change the optimizer settings</li>
+<li><strong>param</strong> verbose: should additional information be printed? If set &gt; 0, additional
+information will be provided. Highly recommended for initial runs. Note that
+the optimizer itself has a separate verbose argument that can be used to print
+information on each iteration. This can be set with the controlOptimizer - argument.</li>
+<li><strong>return</strong> fitResults</li>
+</ul>
+<h2 id="ista_1">ista</h2>
+<h3 id="version-1_1">Version 1</h3>
+<p>Implements (variants of) the ista optimizer.</p>
+<ul>
+<li><strong>param</strong> model_: the model object derived from the model class in model.h</li>
+<li><strong>param</strong> startingValuesRcpp: an Rcpp numeric vector with starting values</li>
+<li><strong>param</strong> proximalOperator_: a proximal operator for the penalty function</li>
+<li><strong>param</strong> penalty_: a penalty derived from the penalty class in penalty.h</li>
+<li><strong>param</strong> smoothPenalty_: a smooth penalty derived from the smoothPenalty class in smoothPenalty.h</li>
+<li><strong>param</strong> tuningParameters: tuning parameters for the penalty function</li>
+<li><strong>param</strong> smoothTuningParameters: tuning parameters for the smooth penalty function</li>
+<li><strong>param</strong> control_: settings for the ista optimizer. </li>
+<li><strong>return</strong> fit result</li>
+</ul>
+<h3 id="version-2_1">Version 2</h3>
+<p>Implements (variants of) the ista optimizer.</p>
+<ul>
+<li><strong>param</strong> model_: the model object derived from the model class in model.h</li>
+<li><strong>param</strong> startingValues: an arma::rowvec numeric vector with starting values</li>
+<li><strong>param</strong> parameterLabels: a less::stringVector with labels for parameters</li>
+<li><strong>param</strong> proximalOperator_: a proximal operator for the penalty function</li>
+<li><strong>param</strong> penalty_: a penalty derived from the penalty class in penalty.h</li>
+<li><strong>param</strong> smoothPenalty_: a smooth penalty derived from the smoothPenalty class in smoothPenalty.h</li>
+<li><strong>param</strong> tuningParameters: tuning parameters for the penalty function</li>
+<li><strong>param</strong> smoothTuningParameters: tuning parameters for the smooth penalty function</li>
+<li><strong>param</strong> control_: settings for the ista optimizer.</li>
+<li><strong>return</strong> fit result</li>
+</ul>
+<h2 id="controldefault">controlDefault</h2>
+<p>Returns default for the optimizer settings</p>
+<h2 id="optimizer-settings">Optimizer settings</h2>
+<p>The ista optimizer has the following additional settings:</p>
+<ul>
+<li><code>L0</code>: a <code>double</code> controling the step size used in the first iteration</li>
+<li><code>eta</code>: a <code>double</code> controling by how much the step size changes in inner iterations with $(\eta^i)*L$, where $i$ is the inner iteration</li>
+<li><code>accelerate</code>: a <code>bool</code>; if  the extrapolation parameter is used to accelerate ista (see, e.g., Parikh, N., &amp; Boyd, S. (2013). Proximal Algorithms. 
+Foundations and Trends in Optimization, 1(3), 123–231., p. 152)</li>
+<li><code>maxIterOut</code>: an <code>int</code> specifying the maximal number of outer iterations</li>
+<li><code>maxIterIn</code>: an <code>int</code> specifying the maximal number of inner iterations</li>
+<li><code>breakOuter</code>: a <code>double</code> specyfing the stopping criterion for outer iterations</li>
+<li><code>breakInner</code>: a <code>double</code> specyfing the stopping criterion for inner iterations</li>
+<li><code>convCritInner</code>: a <code>convCritInnerIsta</code> that specifies the inner breaking condition. Can be set to <code>less::istaCrit</code> (see Beck &amp; Teboulle (2009);
+ Remark 3.1 on p. 191 (ISTA with backtracking)) or <code>less::gistCrit</code> (see Gong et al., 2013; Equation 3) </li>
+<li><code>sigma</code>: a <code>double</code> in (0,1) that is used by the gist convergence criterion. Larger sigma enforce larger improvement in fit</li>
+<li><code>stepSizeIn</code>: a <code>stepSizeInheritance</code> that specifies how step sizes should be carried forward from iteration to iteration. <code>less::initial</code>: resets the step size to L0 in each iteration, <code>less::istaStepInheritance</code>: takes the previous step size as initial value for the next iteration, <code>less::barzilaiBorwein</code>: uses the Barzilai-Borwein procedure, <code>less::stochasticBarzilaiBorwein</code>: uses the Barzilai-Borwein procedure, but sometimes resets the step size; this can help when the optimizer is caught in a bad spot.</li>
+<li><code>sampleSize</code>: an <code>int</code> that can be used to scale the fitting function down if the fitting function depends on the sample size</li>
+<li><code>verbose</code>: an <code>int</code>, where 0 prints no additional information, &gt; 0 prints GLMNET iterations</li>
+</ul>
+<h3 id="convcritinnerista">convCritInnerIsta</h3>
+<p>Convergence criteria used by the ista optimizer.</p>
+<ul>
+<li><strong>value</strong> istaCrit: The approximated fit based on the quadratic approximation
+h(parameters_k) := fit(parameters_k) +
+(parameters_k-parameters_kMinus1)<em>gradients_k^T +
+(L/2)</em>(parameters_k-parameters_kMinus1)^2 +
+penalty(parameters_k)
+is compared to the exact fit</li>
+<li><strong>value</strong> gistCrit: the exact fit is compared to
+h(parameters_k) := fit(parameters_k) +
+penalty(parameters_kMinus1) +
+L<em>(sigma/2)</em>(parameters_k-parameters_kMinus1)^2</li>
+</ul>
+<h3 id="stepsizeinheritance">stepSizeInheritance</h3>
+<p>The ista optimizer provides different rules to be used to find an initial
+step size. It defines if and how the step size should be carried forward
+from iteration to iteration.</p>
+<ul>
+<li><strong>value</strong> initial: resets the step size to L0 in each iteration</li>
+<li><strong>value</strong> istaStepInheritance: takes the previous step size as initial value for the
+next iteration</li>
+<li><strong>value</strong> barzilaiBorwein: uses the Barzilai-Borwein procedure</li>
+<li><strong>value</strong> stochasticBarzilaiBorwein: uses the Barzilai-Borwein procedure, but sometimes
+resets the step size; this can help when the optimizer is caught in a bad spot.</li>
+</ul>
+<h2 id="penalties">Penalties</h2>
+<h3 id="cappedl1">CappedL1</h3>
+<h4 id="tuningparameterscappedl1">tuningParametersCappedL1</h4>
+<p>Tuning parameters for the cappedL1 penalty using ista</p>
+<ul>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> alpha: alpha value of the elastic net (relative importance of ridge and lasso)</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> theta: threshold parameter; any parameter above this threshold will only receive the constant penalty lambda_i<em>theta, all below will get lambda_i</em>parameterValue_i</li>
+</ul>
+<h4 id="proximaloperatorcappedl1">proximalOperatorCappedL1</h4>
+<p>Proximal operator for the cappedL1 penalty function</p>
+<h4 id="penaltycappedl1">penaltyCappedL1</h4>
+<p>CappedL1 penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda \min(| x_j|, \theta)$$
+where $\theta &gt; 0$. The cappedL1 penalty is identical to the lasso for
+parameters which are below $\theta$ and identical to a constant for parameters
+above $\theta$. As adding a constant to the fitting function will not change its
+minimum, larger parameters can stay unregularized while smaller ones are set to zero.</p>
+<p>CappedL1 regularization:</p>
+<ul>
+<li>Zhang, T. (2010). Analysis of Multi-stage Convex Relaxation for Sparse Regularization.
+Journal of Machine Learning Research, 11, 1081–1107.</li>
+</ul>
+<h3 id="lasso">lasso</h3>
+<h4 id="tuningparametersenet">tuningParametersEnet</h4>
+<p>Tuning parameters for the lasso penalty using ista</p>
+<ul>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> alpha: alpha value of the elastic net (relative importance of ridge and lasso)</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="proximaloperatorlasso">proximalOperatorLasso</h4>
+<p>Proximal operator for the lasso penalty function</p>
+<h4 id="penaltylasso">penaltyLASSO</h4>
+<p>Lasso penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda |x_j|$$
+Lasso regularization will set parameters to zero if $\lambda$ is large enough</p>
+<p>Lasso regularization:</p>
+<ul>
+<li>Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical
+Society. Series B (Methodological), 58(1), 267–288.</li>
+</ul>
+<h3 id="lsp">LSP</h3>
+<h4 id="tuningparameterslsp">tuningParametersLSP</h4>
+<p>Tuning parameters for the lsp penalty using ista</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the lsp penalty &gt; 0</li>
+</ul>
+<h4 id="proximaloperatorlsp">proximalOperatorLSP</h4>
+<p>Proximal operator for the lsp penalty function</p>
+<h4 id="penaltylsp">penaltyLSP</h4>
+<p>Lsp penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda \log(1 + |x_j|/\theta)$$
+where $\theta &gt; 0$.</p>
+<p>lsp regularization:</p>
+<ul>
+<li>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008). Enhancing Sparsity by
+Reweighted l1 Minimization. Journal of Fourier Analysis and Applications, 14(5–6),
+877–905. https://doi.org/10.1007/s00041-008-9045-x</li>
+</ul>
+<h3 id="mcp">MCP</h3>
+<h4 id="tuningparametersmcp">tuningParametersMcp</h4>
+<p>Tuning parameters for the mcp penalty optimized with ista</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the cappedL1 penalty &gt; 0</li>
+</ul>
+<h4 id="proximaloperatormcp">proximalOperatorMcp</h4>
+<p>Proximal operator for the mcp penalty function</p>
+<h4 id="penaltymcp">penaltyMcp</h4>
+<p>Mcp penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \begin{cases}
+\lambda |x_j| - x_j^2/(2\theta) &amp; \text{if } |x_j| \leq \theta\lambda\
+\theta\lambda^2/2 &amp; \text{if } |x_j| &gt; \lambda\theta
+\end{cases}$$
+where $\theta &gt; 1$.</p>
+<p>mcp regularization:</p>
+<ul>
+<li>Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty.
+The Annals of Statistics, 38(2), 894–942. https://doi.org/10.1214/09-AOS729</li>
+</ul>
+<h3 id="mixed-penalty">Mixed penalty</h3>
+<h4 id="tuningparametersmixedpenalty">tuningParametersMixedPenalty</h4>
+<p>Tuning parameters for the mixed penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> penaltyType_: penaltyType-vector specifying the penalty to be used for each parameter</li>
+<li><strong>param</strong> lambda: provide parameter-specific lambda values</li>
+<li><strong>param</strong> theta: theta value of the mixed penalty &gt; 0</li>
+<li><strong>param</strong> alpha: alpha value of the mixed penalty &gt; 0</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="proximaloperatormixedpenalty">proximalOperatorMixedPenalty</h4>
+<p>Proximal operator for the mixed penalty function</p>
+<h4 id="penaltymixedpenalty">penaltyMixedPenalty</h4>
+<p>Mixed penalty</p>
+<h3 id="ridge">Ridge</h3>
+<h4 id="tuningparametersenet_1">tuningParametersEnet</h4>
+<p>Tuning parameters for the lasso penalty using ista</p>
+<ul>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> alpha: alpha value of the elastic net (relative importance of ridge and lasso)</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="penaltyridge">penaltyRidge</h4>
+<p>Ridge penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda x_j^2$$
+Note that ridge regularization will not set any of the parameters to zero
+but result in a shrinkage towards zero.</p>
+<p>Ridge regularization:</p>
+<ul>
+<li>Hoerl, A. E., &amp; Kennard, R. W. (1970). Ridge Regression: Biased Estimation
+for Nonorthogonal Problems. Technometrics, 12(1), 55–67.
+https://doi.org/10.1080/00401706.1970.10488634</li>
+</ul>
+<h3 id="scad">SCAD</h3>
+<h4 id="tuningparametersscad">tuningParametersScad</h4>
+<p>Tuning parameters for the scad penalty optimized with ista</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the cappedL1 penalty &gt; 0</li>
+</ul>
+<h4 id="proximaloperatorscad">proximalOperatorScad</h4>
+<p>Proximal operator for the scad penalty function</p>
+<h4 id="penaltyscad">penaltyScad</h4>
+<p>Scad penalty for ista</p>
+<p>The penalty function is given by:
+$$p( x_j) = \begin{cases}
+\lambda |x_j| &amp; \text{if } |x_j| \leq \theta\
+\frac{-x_j^2 + 2\theta\lambda |x_j| - \lambda^2}{2(\theta -1)} &amp;
+\text{if } \lambda &lt; |x_j| \leq \lambda\theta \
+(\theta + 1) \lambda^2/2 &amp; \text{if } |x_j| \geq \theta\lambda\
+$$
+where $\theta &gt; 2$.</p>
+<p>scad regularization:</p>
+<ul>
+<li>Fan, J., &amp; Li, R. (2001). Variable selection via nonconcave penalized
+likelihood and its oracle properties. Journal of the American Statistical Association,
+96(456), 1348–1360. https://doi.org/10.1198/016214501753382273</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      
+        
+          <script src="../javascripts/katex.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1387 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../06-Penalty%20type/">
+      
+      
+        <link rel="next" href="../08-ISTA/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+    
+    
+      
+        <title>GLMNET optimizer - lesstimate</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#glmnet" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="lesstimate" class="md-header__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            lesstimate
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GLMNET optimizer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="lesstimate" class="md-nav__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    lesstimate
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-getting-started/" class="md-nav__link">
+        Regularizing models
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-The%20Optimizer%20Design/" class="md-nav__link">
+        Optimizer design
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Code Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Code Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Model/" class="md-nav__link">
+        Model
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-lesstimate_types/" class="md-nav__link">
+        lesstimate types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Penalty%20type/" class="md-nav__link">
+        penalty types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          GLMNET optimizer
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        GLMNET optimizer
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fitglmnet" class="md-nav__link">
+    fitGlmnet
+  </a>
+  
+    <nav class="md-nav" aria-label="fitGlmnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glmnet_1" class="md-nav__link">
+    glmnet
+  </a>
+  
+    <nav class="md-nav" aria-label="glmnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1_1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2_1" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convergencecriteriaglmnet" class="md-nav__link">
+    convergenceCriteriaGlmnet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#controldefaultglmnet" class="md-nav__link">
+    controlDefaultGlmnet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#penalties" class="md-nav__link">
+    Penalties
+  </a>
+  
+    <nav class="md-nav" aria-label="Penalties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cappedl1" class="md-nav__link">
+    CappedL1
+  </a>
+  
+    <nav class="md-nav" aria-label="CappedL1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterscappedl1glmnet" class="md-nav__link">
+    tuningParametersCappedL1Glmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltycappedl1glmnet" class="md-nav__link">
+    penaltyCappedL1Glmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lasso" class="md-nav__link">
+    lasso
+  </a>
+  
+    <nav class="md-nav" aria-label="lasso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenetglmnet" class="md-nav__link">
+    tuningParametersEnetGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylassoglmnet" class="md-nav__link">
+    penaltyLASSOGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsp" class="md-nav__link">
+    LSP
+  </a>
+  
+    <nav class="md-nav" aria-label="LSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterslspglmnet" class="md-nav__link">
+    tuningParametersLspGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylspglmnet" class="md-nav__link">
+    penaltyLSPGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    MCP
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmcpglmnet" class="md-nav__link">
+    tuningParametersMcpGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymcpglmnet" class="md-nav__link">
+    penaltyMcpGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixed-penalty" class="md-nav__link">
+    Mixed Penalty
+  </a>
+  
+    <nav class="md-nav" aria-label="Mixed Penalty">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmixedglmnet" class="md-nav__link">
+    tuningParametersMixedGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymixedglmnet" class="md-nav__link">
+    penaltyMixedGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ridge" class="md-nav__link">
+    Ridge
+  </a>
+  
+    <nav class="md-nav" aria-label="Ridge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenetglmnet_1" class="md-nav__link">
+    tuningParametersEnetGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyridgeglmnet" class="md-nav__link">
+    penaltyRidgeGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scad" class="md-nav__link">
+    SCAD
+  </a>
+  
+    <nav class="md-nav" aria-label="SCAD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersscadglmnet" class="md-nav__link">
+    tuningParametersScadGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyscadglmnet" class="md-nav__link">
+    penaltySCADGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-ISTA/" class="md-nav__link">
+        ISTA optimizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-fitResults/" class="md-nav__link">
+        fitResults class
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-BFGS/" class="md-nav__link">
+        BFGS optimizer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fitglmnet" class="md-nav__link">
+    fitGlmnet
+  </a>
+  
+    <nav class="md-nav" aria-label="fitGlmnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#glmnet_1" class="md-nav__link">
+    glmnet
+  </a>
+  
+    <nav class="md-nav" aria-label="glmnet">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#version-1_1" class="md-nav__link">
+    Version 1
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#version-2_1" class="md-nav__link">
+    Version 2
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#convergencecriteriaglmnet" class="md-nav__link">
+    convergenceCriteriaGlmnet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#controldefaultglmnet" class="md-nav__link">
+    controlDefaultGlmnet
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#penalties" class="md-nav__link">
+    Penalties
+  </a>
+  
+    <nav class="md-nav" aria-label="Penalties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cappedl1" class="md-nav__link">
+    CappedL1
+  </a>
+  
+    <nav class="md-nav" aria-label="CappedL1">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterscappedl1glmnet" class="md-nav__link">
+    tuningParametersCappedL1Glmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltycappedl1glmnet" class="md-nav__link">
+    penaltyCappedL1Glmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lasso" class="md-nav__link">
+    lasso
+  </a>
+  
+    <nav class="md-nav" aria-label="lasso">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenetglmnet" class="md-nav__link">
+    tuningParametersEnetGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylassoglmnet" class="md-nav__link">
+    penaltyLASSOGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsp" class="md-nav__link">
+    LSP
+  </a>
+  
+    <nav class="md-nav" aria-label="LSP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparameterslspglmnet" class="md-nav__link">
+    tuningParametersLspGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltylspglmnet" class="md-nav__link">
+    penaltyLSPGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mcp" class="md-nav__link">
+    MCP
+  </a>
+  
+    <nav class="md-nav" aria-label="MCP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmcpglmnet" class="md-nav__link">
+    tuningParametersMcpGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymcpglmnet" class="md-nav__link">
+    penaltyMcpGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mixed-penalty" class="md-nav__link">
+    Mixed Penalty
+  </a>
+  
+    <nav class="md-nav" aria-label="Mixed Penalty">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersmixedglmnet" class="md-nav__link">
+    tuningParametersMixedGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltymixedglmnet" class="md-nav__link">
+    penaltyMixedGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ridge" class="md-nav__link">
+    Ridge
+  </a>
+  
+    <nav class="md-nav" aria-label="Ridge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersenetglmnet_1" class="md-nav__link">
+    tuningParametersEnetGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyridgeglmnet" class="md-nav__link">
+    penaltyRidgeGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scad" class="md-nav__link">
+    SCAD
+  </a>
+  
+    <nav class="md-nav" aria-label="SCAD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tuningparametersscadglmnet" class="md-nav__link">
+    tuningParametersScadGlmnet
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#penaltyscadglmnet" class="md-nav__link">
+    penaltySCADGlmnet
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="glmnet">GLMNET</h1>
+<p>The implementation of GLMNET follows that outlined in</p>
+<ol>
+<li>Friedman, J., Hastie, T., &amp; Tibshirani, R. (2010).
+Regularization Paths for Generalized Linear Models via Coordinate Descent.
+Journal of Statistical Software, 33(1), 1–20. https://doi.org/10.18637/jss.v033.i01</li>
+<li>Yuan, G.-X., Chang, K.-W., Hsieh, C.-J., &amp; Lin, C.-J. (2010).
+A Comparison of Optimization Methods and Software for Large-scale
+L1-regularized Linear Classification. Journal of Machine Learning Research, 11, 3183–3234.</li>
+<li>Yuan, G.-X., Ho, C.-H., &amp; Lin, C.-J. (2012).
+An improved GLMNET for l1-regularized logistic regression.
+The Journal of Machine Learning Research, 13, 1999–2030. https://doi.org/10.1145/2020408.2020421</li>
+</ol>
+<h2 id="fitglmnet">fitGlmnet</h2>
+<p>We provide two optimizer interfaces: One uses a combination of arma::rowvec and less::stringVector for starting
+values and parameter labels respectively. This interface is consistent with the fit and gradient function of the
+<code>less::model</code>-class. Alternatively, a numericVector can be passed to the optimizers. This design is rooted in
+the use of Rcpp::NumericVectors that combine values and labels similar to an R vector. Thus, interfacing to this
+second function call can be easier when coming from R.</p>
+<h3 id="version-1">Version 1</h3>
+<ul>
+<li><strong>param</strong> userModel: your model. Must inherit from less::model!</li>
+<li><strong>param</strong> startingValues: numericVector with initial starting values. This
+vector can have names.</li>
+<li><strong>param</strong> penalty: vector with strings indicating the penalty for each parameter.
+Currently supported are "none", "cappedL1", "lasso", "lsp", "mcp", and "scad".
+(e.g., {"none", "scad", "scad", "lasso", "none"}). If only one value is provided,
+the same penalty will be applied to every parameter!</li>
+<li><strong>param</strong> lambda: lambda tuning parameter values. One lambda value for each parameter.
+If only one value is provided, this value will be applied to each parameter.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> theta: theta tuning parameter values. One theta value for each parameter
+If only one value is provided, this value will be applied to each parameter.
+Not all penalties use theta.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> initialHessian: matrix with initial Hessian values.</li>
+<li><strong>param</strong> controlOptimizer: option to change the optimizer settings</li>
+<li><strong>param</strong> verbose: should additional information be printed? If set &gt; 0, additional
+information will be provided. Highly recommended for initial runs. Note that
+the optimizer itself has a separate verbose argument that can be used to print
+information on each iteration. This can be set with the controlOptimizer - argument.</li>
+<li><strong>return</strong> fitResults</li>
+</ul>
+<h3 id="version-2">Version 2</h3>
+<ul>
+<li><strong>param</strong> userModel: your model. Must inherit from less::model!</li>
+<li><strong>param</strong> startingValues: an arma::rowvec numeric vector with starting values</li>
+<li><strong>param</strong> parameterLabels: a less::stringVector with labels for parameters</li>
+<li><strong>param</strong> penalty: vector with strings indicating the penalty for each parameter.
+Currently supported are "none", "cappedL1", "lasso", "lsp", "mcp", and "scad".
+(e.g., {"none", "scad", "scad", "lasso", "none"}). If only one value is provided,
+the same penalty will be applied to every parameter!</li>
+<li><strong>param</strong> lambda: lambda tuning parameter values. One lambda value for each parameter.
+If only one value is provided, this value will be applied to each parameter.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> theta: theta tuning parameter values. One theta value for each parameter
+If only one value is provided, this value will be applied to each parameter.
+Not all penalties use theta.
+Important: The the function will <em>not</em> loop over these values but assume that you
+may want to provide different levels of regularization for each parameter!</li>
+<li><strong>param</strong> initialHessian: matrix with initial Hessian values.</li>
+<li><strong>param</strong> controlOptimizer: option to change the optimizer settings</li>
+<li><strong>param</strong> verbose: should additional information be printed? If set &gt; 0, additional
+information will be provided. Highly recommended for initial runs. Note that
+the optimizer itself has a separate verbose argument that can be used to print
+information on each iteration. This can be set with the controlOptimizer - argument.</li>
+<li><strong>return</strong> fitResults</li>
+</ul>
+<h2 id="glmnet_1">glmnet</h2>
+<p>Optimize a model using the glmnet procedure.</p>
+<h3 id="version-1_1">Version 1</h3>
+<ul>
+<li><strong>T-param</strong> nonsmoothPenalty: class of type nonsmoothPenalty (e.g., lasso, scad, lsp)</li>
+<li><strong>T-param</strong> smoothPenalty: class of type smooth penalty (e.g., ridge)</li>
+<li><strong>T-param</strong> tuning: tuning parameters used by both, the nonsmootPenalty and the smoothPenalty</li>
+<li><strong>param</strong> model_: the model object derived from the model class in model.h</li>
+<li><strong>param</strong> startingValuesRcpp: an Rcpp numeric vector with starting values</li>
+<li><strong>param</strong> penalty_: a penalty derived from the penalty class in penalty.h</li>
+<li><strong>param</strong> smoothPenalty_: a smooth penalty derived from the smoothPenalty class in smoothPenalty.h</li>
+<li><strong>param</strong> tuningParameters: tuning parameters for the penalty functions. Note that both penalty functions must
+ take the same tuning parameters.</li>
+<li><strong>param</strong> control_: settings for the glmnet optimizer.</li>
+<li><strong>return</strong> fit result</li>
+</ul>
+<h3 id="version-2_1">Version 2</h3>
+<ul>
+<li><strong>T-param</strong> nonsmoothPenalty: class of type nonsmoothPenalty (e.g., lasso, scad, lsp)</li>
+<li><strong>T-param</strong> smoothPenalty: class of type smooth penalty (e.g., ridge)</li>
+<li><strong>T-param</strong> tuning: tuning parameters used by both, the nonsmootPenalty and the smoothPenalty</li>
+<li><strong>param</strong> model_: the model object derived from the model class in model.h</li>
+<li><strong>param</strong> startingValues: an arma::rowvec vector with starting values</li>
+<li><strong>param</strong> parameterLabels: a stringVector with parameter labels</li>
+<li><strong>param</strong> penalty_: a penalty derived from the penalty class in penalty.h</li>
+<li><strong>param</strong> smoothPenalty_: a smooth penalty derived from the smoothPenalty class in smoothPenalty.h</li>
+<li><strong>param</strong> tuningParameters: tuning parameters for the penalty functions. Note that both penalty functions must
+ take the same tuning parameters.</li>
+<li><strong>param</strong> control_: settings for the glmnet optimizer.</li>
+<li><strong>return</strong> fit result</li>
+</ul>
+<h2 id="convergencecriteriaglmnet">convergenceCriteriaGlmnet</h2>
+<ul>
+<li><strong>value</strong> GLMNET: Uses the convergence criterion outlined in Yuan et al. (2012) for GLMNET. Note that in case of BFGS, this will be identical to using the Armijo condition.</li>
+<li><strong>value</strong> fitChange: Uses the change in fit from one iteration to the next.</li>
+<li><strong>value</strong> gradients: Uses the gradients; if all are (close to) zero, the minimum is found</li>
+</ul>
+<h2 id="controldefaultglmnet">controlDefaultGlmnet</h2>
+<p>Returns default for the optimizer settings</p>
+<h2 id="optimizer-settings">Optimizer settings</h2>
+<p>The glmnet optimizer has the following additional settings:</p>
+<ul>
+<li><code>initialHessian</code>: an <code>arma::mat</code> with the initial Hessian matrix fo the optimizer. In case of the simplified interface, this 
+argument should not be used. Instead, pass the initial Hessian as shown above</li>
+<li><code>stepSize</code>: a <code>double</code> specifying the initial stepSize of the outer iteration ($\theta_{k+1} = \theta_k + \text{stepSize} * \text{stepDirection}$)</li>
+<li><code>sigma</code>: a <code>double</code> that is only relevant when lineSearch = 'GLMNET'. Controls the sigma parameter in Yuan, G.-X., Ho, C.-H., &amp; Lin, C.-J. (2012). An improved GLMNET for l1-regularized logistic regression. The Journal of Machine Learning Research, 13, 1999–2030. https://doi.org/10.1145/2020408.2020421.</li>
+<li><code>gamma</code>: a <code>double</code> controling the gamma parameter in Yuan, G.-X., Ho, C.-H., &amp; Lin, C.-J. (2012). An improved GLMNET for l1-regularized logistic regression. The Journal of Machine Learning Research, 13, 1999–2030. https://doi.org/10.1145/2020408.2020421. Defaults to 0.</li>
+<li><code>maxIterOut</code>: an <code>int</code> specifying the maximal number of outer iterations</li>
+<li><code>maxIterIn</code>: an <code>int</code> specifying the maximal number of inner iterations</li>
+<li><code>maxIterLine</code>: an <code>int</code> specifying the maximal number of iterations for the line search procedure</li>
+<li><code>breakOuter</code>: a <code>double</code> specyfing the stopping criterion for outer iterations</li>
+<li><code>breakInner</code>: a <code>double</code> specyfing the stopping criterion for inner iterations</li>
+<li><code>convergenceCriterion</code>: a <code>convergenceCriteriaGlmnet</code> specifying which convergence criterion should be used for the outer iterations. Possible are <code>less::GLMNET</code>, <code>less::fitChange</code>,
+and <code>less::gradients</code>. </li>
+<li><code>verbose</code>: an <code>int</code>, where 0 prints no additional information, &gt; 0 prints GLMNET iterations</li>
+</ul>
+<h2 id="penalties">Penalties</h2>
+<h3 id="cappedl1">CappedL1</h3>
+<h4 id="tuningparameterscappedl1glmnet">tuningParametersCappedL1Glmnet</h4>
+<p>tuning parameters for the capped L1 penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the cappedL1 penalty &gt; 0</li>
+</ul>
+<h4 id="penaltycappedl1glmnet">penaltyCappedL1Glmnet</h4>
+<p>cappedL1 penalty for glmnet optimizer.</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda \min(| x_j|, \theta)$$
+where $\theta &gt; 0$. The cappedL1 penalty is identical to the lasso for
+parameters which are below $\theta$ and identical to a constant for parameters
+above $\theta$. As adding a constant to the fitting function will not change its
+minimum, larger parameters can stay unregularized while smaller ones are set to zero.</p>
+<p>CappedL1 regularization:</p>
+<ul>
+<li>Zhang, T. (2010). Analysis of Multi-stage Convex Relaxation for Sparse Regularization.
+Journal of Machine Learning Research, 11, 1081–1107.</li>
+</ul>
+<h3 id="lasso">lasso</h3>
+<h4 id="tuningparametersenetglmnet">tuningParametersEnetGlmnet</h4>
+<p>Tuning parameters of the elastic net. For glmnet, we allow for different alphas and lambdas to combine penalties.p</p>
+<ul>
+<li><strong>param</strong> lambda: parameter-specific lambda value &gt;= 0</li>
+<li><strong>param</strong> alpha: parameter-specific alpha value of the elastic net (relative importance of ridge and lasso)</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="penaltylassoglmnet">penaltyLASSOGlmnet</h4>
+<p>lasso penalty for glmnet</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda |x_j|$$
+Lasso regularization will set parameters to zero if $\lambda$ is large enough</p>
+<p>Lasso regularization:</p>
+<ul>
+<li>Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. Journal of the Royal Statistical
+Society. Series B (Methodological), 58(1), 267–288.</li>
+</ul>
+<h3 id="lsp">LSP</h3>
+<h4 id="tuningparameterslspglmnet">tuningParametersLspGlmnet</h4>
+<p>Tuning parameters for the lsp penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the lsp penalty &gt; 0</li>
+</ul>
+<h4 id="penaltylspglmnet">penaltyLSPGlmnet</h4>
+<p>Lsp penalty for glmnet optimizer.</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda \log(1 + |x_j|/\theta)$$
+where $\theta &gt; 0$.</p>
+<p>lsp regularization:</p>
+<ul>
+<li>Candès, E. J., Wakin, M. B., &amp; Boyd, S. P. (2008). Enhancing Sparsity by
+Reweighted l1 Minimization. Journal of Fourier Analysis and Applications, 14(5–6),
+877–905. https://doi.org/10.1007/s00041-008-9045-x</li>
+</ul>
+<h3 id="mcp">MCP</h3>
+<h4 id="tuningparametersmcpglmnet">tuningParametersMcpGlmnet</h4>
+<p>Tuning parameters for the mcp penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the cappedL1 penalty &gt; 0</li>
+</ul>
+<h4 id="penaltymcpglmnet">penaltyMcpGlmnet</h4>
+<p>Mcp penalty for glmnet optimizer</p>
+<p>The penalty function is given by:
+$$p( x_j) = \begin{cases}
+\lambda |x_j| - x_j^2/(2\theta) &amp; \text{if } |x_j| \leq \theta\lambda\
+\theta\lambda^2/2 &amp; \text{if } |x_j| &gt; \lambda\theta
+\end{cases}$$
+where $\theta &gt; 1$.</p>
+<p>mcp regularization:</p>
+<ul>
+<li>Zhang, C.-H. (2010). Nearly unbiased variable selection under minimax concave penalty.
+The Annals of Statistics, 38(2), 894–942. https://doi.org/10.1214/09-AOS729</li>
+</ul>
+<h3 id="mixed-penalty">Mixed Penalty</h3>
+<h4 id="tuningparametersmixedglmnet">tuningParametersMixedGlmnet</h4>
+<p>Tuning parameters for the mixed penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> penaltyType_: penaltyType-vector specifying the penalty to be used for each parameter</li>
+<li><strong>param</strong> lambda: provide parameter-specific lambda values</li>
+<li><strong>param</strong> theta: theta value of the mixed penalty &gt; 0</li>
+<li><strong>param</strong> alpha: alpha value of the mixed penalty &gt; 0</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="penaltymixedglmnet">penaltyMixedGlmnet</h4>
+<p>Mixed penalty for glmnet optimizer</p>
+<h3 id="ridge">Ridge</h3>
+<h4 id="tuningparametersenetglmnet_1">tuningParametersEnetGlmnet</h4>
+<p>Tuning parameters of the elastic net. For glmnet, we allow for different alphas and lambdas to combine penalties.p</p>
+<ul>
+<li><strong>param</strong> lambda: parameter-specific lambda value &gt;= 0</li>
+<li><strong>param</strong> alpha: parameter-specific alpha value of the elastic net (relative importance of ridge and lasso)</li>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+</ul>
+<h4 id="penaltyridgeglmnet">penaltyRidgeGlmnet</h4>
+<p>ridge penalty for glmnet optimizer</p>
+<p>The penalty function is given by:
+$$p( x_j) = \lambda x_j^2$$
+Note that ridge regularization will not set any of the parameters to zero
+but result in a shrinkage towards zero.</p>
+<p>Ridge regularization:</p>
+<ul>
+<li>Hoerl, A. E., &amp; Kennard, R. W. (1970). Ridge Regression: Biased Estimation
+for Nonorthogonal Problems. Technometrics, 12(1), 55–67.
+https://doi.org/10.1080/00401706.1970.10488634</li>
+</ul>
+<h3 id="scad">SCAD</h3>
+<h4 id="tuningparametersscadglmnet">tuningParametersScadGlmnet</h4>
+<p>Tuning parameters for the scad penalty optimized with glmnet</p>
+<ul>
+<li><strong>param</strong> weights: provide parameter-specific weights (e.g., for adaptive lasso)</li>
+<li><strong>param</strong> lambda: lambda value &gt;= 0</li>
+<li><strong>param</strong> theta: theta value of the cappedL1 penalty &gt; 0</li>
+</ul>
+<h4 id="penaltyscadglmnet">penaltySCADGlmnet</h4>
+<p>Scad penalty for glmnet</p>
+<p>The penalty function is given by:
+$$p( x_j) = \begin{cases}
+\lambda |x_j| &amp; \text{if } |x_j| \leq \theta\
+\frac{-x_j^2 + 2\theta\lambda |x_j| - \lambda^2}{2(\theta -1)} &amp;
+\text{if } \lambda &lt; |x_j| \leq \lambda\theta \
+(\theta + 1) \lambda^2/2 &amp; \text{if } |x_j| \geq \theta\lambda\
+$$
+where $\theta &gt; 2$.</p>
+<p>scad regularization:</p>
+<ul>
+<li>Fan, J., &amp; Li, R. (2001). Variable selection via nonconcave penalized
+likelihood and its oracle properties. Journal of the American Statistical Association,
+96(456), 1348–1360. https://doi.org/10.1198/016214501753382273</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      
+        
+          <script src="../javascripts/katex.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+      
+    
+  </body>
+</html>

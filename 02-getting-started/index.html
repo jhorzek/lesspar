@@ -1,0 +1,1188 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../01-installation/">
+      
+      
+        <link rel="next" href="../03-The%20Optimizer%20Design/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.18">
+    
+    
+      
+        <title>Regularizing models - lesstimate</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.26e3688c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ecc896b0.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="lesstimate" class="md-header__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            lesstimate
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Regularizing models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="lesstimate" class="md-nav__button md-logo" aria-label="lesstimate" data-md-component="logo">
+      
+  <img src="../lesstimate_logo.png" alt="logo">
+
+    </a>
+    lesstimate
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jhorzek/lesstimate" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          Getting Started
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Getting Started
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-installation/" class="md-nav__link">
+        Installation
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Regularizing models
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Regularizing models
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#interfacing-to-lesstimate" class="md-nav__link">
+    Interfacing to lesstimate
+  </a>
+  
+    <nav class="md-nav" aria-label="Interfacing to lesstimate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-including-the-necessary-headers" class="md-nav__link">
+    Step 1: Including the necessary headers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-implement-the-fit-and-gradient-functions" class="md-nav__link">
+    Step 2: Implement the fit and gradient functions:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-creating-a-model-object" class="md-nav__link">
+    Step 3: Creating a model object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-interfacing-to-the-optimizers" class="md-nav__link">
+    Step 4: Interfacing to the optimizers
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specialized-interfaces" class="md-nav__link">
+    Specialized interfaces
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-The%20Optimizer%20Design/" class="md-nav__link">
+        Optimizer design
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          Code Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Code Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-Model/" class="md-nav__link">
+        Model
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-lesstimate_types/" class="md-nav__link">
+        lesstimate types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-Penalty%20type/" class="md-nav__link">
+        penalty types
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-GLMNET/" class="md-nav__link">
+        GLMNET optimizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-ISTA/" class="md-nav__link">
+        ISTA optimizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-fitResults/" class="md-nav__link">
+        fitResults class
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-BFGS/" class="md-nav__link">
+        BFGS optimizer
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#interfacing-to-lesstimate" class="md-nav__link">
+    Interfacing to lesstimate
+  </a>
+  
+    <nav class="md-nav" aria-label="Interfacing to lesstimate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-including-the-necessary-headers" class="md-nav__link">
+    Step 1: Including the necessary headers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-implement-the-fit-and-gradient-functions" class="md-nav__link">
+    Step 2: Implement the fit and gradient functions:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-creating-a-model-object" class="md-nav__link">
+    Step 3: Creating a model object
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-interfacing-to-the-optimizers" class="md-nav__link">
+    Step 4: Interfacing to the optimizers
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimizer-settings" class="md-nav__link">
+    Optimizer settings
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specialized-interfaces" class="md-nav__link">
+    Specialized interfaces
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    References
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="getting-started">Getting Started</h1>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">R</label><label for="__tabbed_1_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>All steps outlined in the following are provided in the template for R packages using <strong>lesstimate</strong>. The C++ code can be found <a href="https://github.com/jhorzek/lesstimateTemplateR/blob/main/src/example.cpp">in the src directory of the package</a>.</p>
+</div>
+<div class="tabbed-block">
+<p>All steps outlined in the following are provided in the template for C++ packages using <strong>lesstimate</strong>. The C++ code can be found <a href="https://github.com/jhorzek/lesstimateTemplateCpp/blob/main/linear_regression.cpp">in the linear_regression.cpp file of the package</a>.</p>
+</div>
+</div>
+</div>
+<p><strong>lesstimate</strong> was initially a sub-folder of the <strong>lessSEM</strong> package. Therefore,
+the default is currently to still assume that you are using the library in an R package.
+In the <a href="https://github.com/jhorzek/lesstimate/blob/f8aa3169da617ca2d6afbd330e1fb5395ba40898/include/common_headers.h#L8">common_headers.h</a>-file, 
+you will find a variable called <code>USE_R</code>. If this variable is set to 1 (default), <strong>lesstimate</strong>
+is setup to be used from R. If <code>USE_R</code> is set to zero, the library no longer relies on the R packages
+<strong>Rcpp</strong> (Eddelbuettel et al., 2011) or <strong>RcppArmadillo</strong> (Eddelbuettel et al., 2014). The library can now be used in 
+C++ projects as long as the <a href="https://arma.sourceforge.net/"><strong>armadillo</strong></a> (Sanderson et al., 2016)
+library is installed. These settings are implemented in the <a href="https://github.com/jhorzek/lesstimate/blob/b952a8509f388f2284450414bc781a9114c98243/lesstimateConfig.cmake">lesstimateConfig.cmake</a>-file included
+in the project.</p>
+<h2 id="interfacing-to-lesstimate">Interfacing to <strong>lesstimate</strong></h2>
+<p>As outlined in the introduction, the optimizers in <strong>lesstimate</strong> minimize functions
+of the form 
+$$g(\pmb\theta) = f(\pmb\theta) + p(\pmb\theta)$$
+where $f(\pmb\theta)$ is (twice) continously differentiable with respect to $\theta$ and $p(\pmb\theta)$
+is a non-differentiable penalty function (e.g., lasso or scad).
+To use <strong>lesstimate</strong> for your project, you will need two functions.
+First, a function that computes $f(\pmb\theta)$, the value of your un-
+regularized objective function. Second, a function that computes 
+$\triangledown_{\pmb\theta} f(\pmb\theta)$, the gradient vector of your
+un-regularized objective function with respect to the parameters $\pmb\theta$.
+We also assume that these functions use <strong>armadillo</strong>. If you don't use <strong>armadillo</strong>,
+you may have to write a translation layer. The optimizer interface outlined in the following
+is adapted from the <a href="https://ensmallen.org/"><strong>ensmallen</strong></a> library (Curtin et al.; 2021).</p>
+<h3 id="step-1-including-the-necessary-headers">Step 1: Including the necessary headers</h3>
+<p>First, let's include the necessary headers:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">R</label><label for="__tabbed_2_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>#include &lt;RcppArmadillo.h&gt;
+// [[Rcpp :: depends ( RcppArmadillo )]]
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>#include &lt;armadillo&gt;
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="step-2-implement-the-fit-and-gradient-functions">Step 2: Implement the fit and gradient functions:</h3>
+<p>Let's assume that you want to estimate a linear regression model. In this case,
+the fit and gradient function could look as follows:</p>
+<div class="highlight"><pre><span></span><code>double sumSquaredError(
+    arma::colvec b, // the parameter vector
+    arma::colvec y, // the dependent variable
+    arma::mat X     // the design matrix
+)
+{
+  // compute the sum of squared errors:
+  arma::mat sse = arma::trans(y - X * b) * (y - X * b);
+
+  // other packages, such as glmnet, scale the sse with
+  // 1/(2*N), where N is the sample size. We will do that here as well
+
+  sse *= 1.0 / (2.0 * y.n_elem);
+
+  // note: We must return a double, but the sse is a matrix
+  // To get a double, just return the single value that is in
+  // this matrix:
+  return (sse(0, 0));
+}
+
+arma::rowvec sumSquaredErrorGradients(
+    arma::colvec b, // the parameter vector
+    arma::colvec y, // the dependent variable
+    arma::mat X     // the design matrix
+)
+{
+  // note: we want to return our gradients as row-vector; therefore,
+  // we have to transpose the resulting column-vector:
+  arma::rowvec gradients = arma::trans(-2.0 * X.t() * y + 2.0 * X.t() * X * b);
+
+  // other packages, such as glmnet, scale the sse with
+  // 1/(2*N), where N is the sample size. We will do that here as well
+
+  gradients *= (.5 / y.n_rows);
+
+  return (gradients);
+ }
+</code></pre></div>
+<p>With these two functions, we are ready to go. If you want to use the glmnet optimizer,
+you may want to also implement a function that computes the Hessian. It can be beneficial to
+provide a good starting point for the bfgs updates using this Hessian.</p>
+<h3 id="step-3-creating-a-model-object">Step 3: Creating a model object</h3>
+<p><strong>lesstimate</strong> assumes that you pass a model-object to the optimizers. This model 
+object ist implemented in the <a href="https://github.com/jhorzek/lesstimate/blob/main/include/model.h"><code>less::model</code>-class</a>.
+Therefore, we have to create a custom class that inherits from <code>less::model</code> and 
+implements our linear regression using the functions defined above. </p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">R</label><label for="__tabbed_3_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Make sure to follow the install instructions for R first to make this work:
+<div class="highlight"><pre><span></span><code>#include &quot;lessSEM.h&quot;
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<p>We recommend setting up <strong>lesstimate</strong> with CMake. You will find an example <a href="https://github.com/jhorzek/lesstimateTemplateCpp">here</a>.
+<div class="highlight"><pre><span></span><code>#include &lt;lesstimate.h&gt;
+</code></pre></div></p>
+</div>
+</div>
+</div>
+<div class="highlight"><pre><span></span><code>// IMPORTANT: The library is called lesstimate, but
+// because it was initially a sub-folder of lessSEM, there
+// are two namespaces that are identical: less and lessSEM.
+
+class linearRegressionModel : public less::model
+{
+
+public:
+  // the less::model class has two methods: &quot;fit&quot; and &quot;gradients&quot;.
+  // Both of these methods must follow a fairly strict framework.
+  // First: They must receive exactly two arguments:
+  //        1) an arma::rowvec with current parameter values
+  //        2) an Rcpp::StringVector with current parameter labels
+  //          (NOTE: the lessSEM package currently does not make use of these
+  //          labels. This is just for future use. If you don&#39;t want to use 
+  //          the labels, just pass any less::stringVector you want).
+  //          if you are using R, a less::stringVector is just an 
+  //          Rcpp::StringVector. Otherwise it is a custom vector. that can
+  //          be created with less::stringVector myVector(numberofParameters).
+  // Second:
+  //        1) fit must return a double (e.g., the -2-log-likelihood)
+  //        2) gradients must return an arma::rowvec with the gradients. It is
+  //           important that the gradients are returned in the same order as the
+  //           parameters (i.e., don&#39;t shuffle your gradients, lessSEM will 
+  //           assume that the first value in gradients corresponds to the
+  //           derivative with respect to the first parameter passed to 
+  //           the function).
+
+  double fit(arma::rowvec b, less::stringVector labels) override
+  {
+    // NOTE: In sumSquaredError we assumed that b was a column-vector. We
+    //  have to transpose b to make things work
+    return (sumSquaredError(b.t(), y, X));
+  }
+
+  arma::rowvec gradients(arma::rowvec b, less::stringVector labels) override
+  {
+    // NOTE: In sumSquaredErrorGradients we assumed that b was a column-vector. We
+    //  have to transpose b to make things work
+    return (sumSquaredErrorGradients(b.t(), y, X));
+  }
+
+  // IMPORTANT: Note that we used some arguments above which we did not pass to
+  // the functions: y, and X. Without these arguments, we cannot use our
+  // sumSquaredError and sumSquaredErrorGradients function! To make these 
+  // accessible to our functions, we have to define them:
+
+  const arma::colvec y;
+  const arma::mat X;
+
+  // finally, we create a constructor for our class
+  linearRegressionModel(arma::colvec y_, arma::mat X_) : y(y_), X(X_){};
+};
+</code></pre></div>
+<p>Instances of <code>linearRegressionModel</code> can be passed to the <code>glmnet</code> or <code>ista</code> optimizers.</p>
+<h3 id="step-4-interfacing-to-the-optimizers">Step 4: Interfacing to the optimizers</h3>
+<p>Ther are two interfaces you can use: </p>
+<ol>
+<li>A specialized interface, where the model is penalized only using one specific penalty function.
+This requires more work, but is typically a bit faster than using the second approach.</li>
+<li>A simplified interface that allows you to use any of the penalty functions (and also mix them)</li>
+</ol>
+<p>We will use the simplified interface in the following. To this end, we will first create a new
+instance of our linearRegressionModel:</p>
+<div class="highlight"><pre><span></span><code>arma::mat X = {{1.00, -0.70, -0.86},
+               {1.00, -1.20, -2.10},
+               {1.00, -0.15,  1.13},
+               {1.00, -0.50, -1.50},
+               {1.00,  0.83,  0.44},
+               {1.00, -1.52, -0.72},
+               {1.00,  1.40, -1.30},
+               {1.00, -0.60, -0.59},
+               {1.00, -1.10,  2.00},
+               {1.00, -0.96, -0.20}};
+
+arma::colvec y = {{ 0.56},
+                  {-0.32},
+                  { 0.01},
+                  {-0.09},
+                  { 0.18},
+                  {-0.11},
+                  { 0.62},
+                  { 0.72},
+                  { 0.52},
+                  { 0.12}};
+
+linearRegressionModel linReg(y, X);
+</code></pre></div>
+<p>Next, we create a vector with starting values using <strong>armadillo</strong>. This vector must be of 
+length of the number of parameters in the model. In our case, these are three: the intercept
+and two predictors.</p>
+<p><div class="highlight"><pre><span></span><code>arma::rowvec startingValues(3);
+startingValues.fill(0.0);
+</code></pre></div>
+<strong>lesstimate</strong> also expects labels for these parameters. The labels are stored in an object of
+class <code>less::stringVector</code>:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">R</label><label for="__tabbed_4_2">C++</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>When using R, <code>less::stringVector</code> is identical to <code>Rcpp::StringVector</code>.
+<div class="highlight"><pre><span></span><code><span class="n">Rcpp</span><span class="o">::</span><span class="n">StringVector</span><span class="w"> </span><span class="nf">parameterLabels</span><span class="p">(</span><span class="m">3</span><span class="p">);</span>
+<span class="n">parameterLabels</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;b0&quot;</span><span class="p">;</span>
+<span class="n">parameterLabels</span><span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;b1&quot;</span><span class="p">;</span>
+<span class="n">parameterLabels</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;b2&quot;</span><span class="p">;</span>
+</code></pre></div></p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">labels</span><span class="w"> </span><span class="p">{</span><span class="s">&quot;b0&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b2&quot;</span><span class="p">};</span>
+<span class="n">less</span><span class="o">::</span><span class="n">stringVector</span><span class="w"> </span><span class="nf">parameterLabels</span><span class="p">(</span><span class="n">labels</span><span class="p">);</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Now we have to specify the values for our tuning parameters. These
+depend on the penalty we want to use:</p>
+<p><img alt="peanlty functions" src="../penaltyFunctions.png" /></p>
+<p>Note that some penalty functions only have $\lambda$ as tuning parameter, while others
+have $\lambda$ and $\theta$. The interface used below does not support elastic net penalties;
+that is, $\alpha$ is not used. Furthermore, the adaptive lasso requires setting up the weights
+manually by specifying parameter-specific $\lambda$-values. We now specify for each parameter, 
+which penalty we want to use and what values the tuning parameter should have for this parameter. 
+If a tuning parameter is not used by the respective penalty, just set it to 0 or any other value:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">lasso</label><label for="__tabbed_5_2">mixed penalty</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// penalty: We don&#39;t penalize the intercept b0, but we penalize</span>
+<span class="c1">// b1 and b2 with lasso:</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">penalty</span><span class="p">{</span><span class="s">&quot;none&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lasso&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lasso&quot;</span><span class="p">};</span>
+
+<span class="c1">// tuning parameter lambda:</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">}};</span>
+<span class="c1">// theta is not used by the lasso penalty:</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">}};</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// penalty: We don&#39;t penalize the intercept b0, but we penalize</span>
+<span class="c1">// b1 with lasso and b2 with scad:</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="w"> </span><span class="n">penalty</span><span class="p">{</span><span class="s">&quot;none&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lasso&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;scad&quot;</span><span class="p">};</span>
+
+<span class="c1">// tuning parameter lambda:</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">}};</span>
+<span class="c1">// theta is not used by the lasso penalty:</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="n">theta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.6</span><span class="p">}};</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Note that the penalty used for each parameter is specified in the <code>std::vector&lt;std::string&gt;</code> vector <code>penalty</code>.
+Currently, any of the following penalty labels is supported:  <code>"none"</code> (no penalty), <code>"cappedL1"</code>, <code>"lasso"</code>, 
+<code>"lsp"</code>, <code>"mcp"</code>, and <code>"scad"</code>. </p>
+<p>Having specified the penalty and the tuning values, we can now use the optimizers:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">glmnet</label><label for="__tabbed_6_2">ista</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>To use glmnet successfully, you should also provide an initial Hessian as this can
+ improve the optimization considerably. For simplicity, we won't do this here.</p>
+<div class="highlight"><pre><span></span><code><span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">fitResult_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">fitGlmnet</span><span class="p">(</span>
+<span class="w">      </span><span class="n">linReg</span><span class="p">,</span>
+<span class="w">      </span><span class="n">startingValues</span><span class="p">,</span>
+<span class="w">      </span><span class="n">parameterLabels</span><span class="p">,</span>
+<span class="w">      </span><span class="n">penalty</span><span class="p">,</span>
+<span class="w">      </span><span class="n">lambda</span><span class="p">,</span>
+<span class="w">      </span><span class="n">theta</span><span class="c1">//,</span>
+<span class="w">      </span><span class="c1">// initialHessian, // optional, but can be very useful</span>
+<span class="w">    </span><span class="c1">// controlOptimizer, // optional: change the settings of the optimizer.</span>
+<span class="w">    </span><span class="c1">// verbose // set to &gt;0 to get additional information on the optimization</span>
+<span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">fitResult_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">fitIsta</span><span class="p">(</span>
+<span class="w">    </span><span class="n">linReg</span><span class="p">,</span>
+<span class="w">    </span><span class="n">startingValues</span><span class="p">,</span>
+<span class="w">    </span><span class="n">parameterLabels</span><span class="p">,</span>
+<span class="w">    </span><span class="n">penalty</span><span class="p">,</span>
+<span class="w">    </span><span class="n">lambda</span><span class="p">,</span>
+<span class="w">    </span><span class="n">theta</span><span class="c1">//,</span>
+<span class="w">    </span><span class="c1">// controlOptimizer, // optional: change the settings of the optimizer</span>
+<span class="w">    </span><span class="c1">// verbose // set to &gt;0 to get additional information on the optimization</span>
+<span class="w">    </span><span class="p">);</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>In the <code>fitResults_</code> object, you will find:</p>
+<ul>
+<li><em>fit</em>: the final fit value (regularized fit)</li>
+<li><em>fits</em>: a vector with all fits at the outer iteration</li>
+<li><em>convergence</em>: was the outer breaking condition met?</li>
+<li><em>parameterValues</em>: final parameter values (of class <code>arma::rowvec</code>)</li>
+<li><em>Hessian</em>: final Hessian approximation in case of glmnet (Note: this is a bfgs approximated Hessian).
+Returning this Hessian is useful because it can be used as input for the next optimization if glmnet is
+used with multiple tuning parameter settings (e.g., $\lambda \in {0, .1, .2, ..., 1}$.</li>
+</ul>
+<h2 id="optimizer-settings">Optimizer settings</h2>
+<p>The default settings of the optimizers may not work for your use case. Adapting these settings can therefore be crucial for a 
+succesful optimization. In the <code>fitGlmnet</code> and <code>fitIsta</code> functions above, the optimizer settings are adapted using the <code>controlOptimizer</code>
+argument. Depending on the optimizer used, different settings can be adapted.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">glmnet</label><label for="__tabbed_7_2">ista</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The glmnet optimizer has the following additional settings:</p>
+<ul>
+<li><code>initialHessian</code>: an <code>arma::mat</code> with the initial Hessian matrix fo the optimizer. In case of the simplified interface, this 
+argument should not be used. Instead, pass the initial Hessian as shown above</li>
+<li><code>stepSize</code>: a <code>double</code> specifying the initial stepSize of the outer iteration ($\theta_{k+1} = \theta_k + \text{stepSize} * \text{stepDirection}$)</li>
+<li><code>sigma</code>: a <code>double</code> that is only relevant when lineSearch = 'GLMNET'. Controls the sigma parameter in Yuan, G.-X., Ho, C.-H., &amp; Lin, C.-J. (2012). An improved GLMNET for l1-regularized logistic regression. The Journal of Machine Learning Research, 13, 1999–2030. https://doi.org/10.1145/2020408.2020421.</li>
+<li><code>gamma</code>: a <code>double</code> controling the gamma parameter in Yuan, G.-X., Ho, C.-H., &amp; Lin, C.-J. (2012). An improved GLMNET for l1-regularized logistic regression. The Journal of Machine Learning Research, 13, 1999–2030. https://doi.org/10.1145/2020408.2020421. Defaults to 0.</li>
+<li><code>maxIterOut</code>: an <code>int</code> specifying the maximal number of outer iterations</li>
+<li><code>maxIterIn</code>: an <code>int</code> specifying the maximal number of inner iterations</li>
+<li><code>maxIterLine</code>: an <code>int</code> specifying the maximal number of iterations for the line search procedure</li>
+<li><code>breakOuter</code>: a <code>double</code> specyfing the stopping criterion for outer iterations</li>
+<li><code>breakInner</code>: a <code>double</code> specyfing the stopping criterion for inner iterations</li>
+<li><code>convergenceCriterion</code>: a <code>convergenceCriteriaGlmnet</code> specifying which convergence criterion should be used for the outer iterations. Possible are <code>less::GLMNET</code>, <code>less::fitChange</code>,
+and <code>less::gradients</code>. </li>
+<li><code>verbose</code>: an <code>int</code>, where 0 prints no additional information, &gt; 0 prints GLMNET iterations</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// First, create a new instance of class controlGLMNET:</span>
+<span class="n">less</span><span class="o">::</span><span class="n">controlGLMNET</span><span class="w"> </span><span class="n">controlOptimizer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">controlGlmnetDefault</span><span class="p">();</span>
+<span class="c1">// Next, adapt the settings:</span>
+<span class="n">controlOptimizer</span><span class="p">.</span><span class="n">maxIterOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="c1">// pass the argument to the fitGlmnet function:</span>
+<span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">fitResult_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">fitGlmnet</span><span class="p">(</span>
+<span class="w">      </span><span class="n">linReg</span><span class="p">,</span>
+<span class="w">      </span><span class="n">startingValues</span><span class="p">,</span>
+<span class="w">      </span><span class="n">parameterLabels</span><span class="p">,</span>
+<span class="w">      </span><span class="n">penalty</span><span class="p">,</span>
+<span class="w">      </span><span class="n">lambda</span><span class="p">,</span>
+<span class="w">      </span><span class="n">theta</span><span class="p">,</span>
+<span class="w">     </span><span class="c1">// sets Hessian to identity; a better Hessian will help!</span>
+<span class="w">      </span><span class="n">arma</span><span class="o">::</span><span class="n">mat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">arma</span><span class="o">::</span><span class="n">fill</span><span class="o">::</span><span class="n">ones</span><span class="p">),</span><span class="w"> </span><span class="c1">// initial Hessian</span>
+<span class="w">    </span><span class="n">controlOptimizer</span><span class="c1">//,</span>
+<span class="w">    </span><span class="c1">// verbose // set to &gt;0 to get additional information on the optimization</span>
+<span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>The ista optimizer has the following additional settings:</p>
+<ul>
+<li><code>L0</code>: a <code>double</code> controling the step size used in the first iteration</li>
+<li><code>eta</code>: a <code>double</code> controling by how much the step size changes in inner iterations with $(\eta^i)*L$, where $i$ is the inner iteration</li>
+<li><code>accelerate</code>: a <code>bool</code>; if  the extrapolation parameter is used to accelerate ista (see, e.g., Parikh, N., &amp; Boyd, S. (2013). Proximal Algorithms. 
+Foundations and Trends in Optimization, 1(3), 123–231., p. 152)</li>
+<li><code>maxIterOut</code>: an <code>int</code> specifying the maximal number of outer iterations</li>
+<li><code>maxIterIn</code>: an <code>int</code> specifying the maximal number of inner iterations</li>
+<li><code>breakOuter</code>: a <code>double</code> specyfing the stopping criterion for outer iterations</li>
+<li><code>breakInner</code>: a <code>double</code> specyfing the stopping criterion for inner iterations</li>
+<li><code>convCritInner</code>: a <code>convCritInnerIsta</code> that specifies the inner breaking condition. Can be set to <code>less::istaCrit</code> (see Beck &amp; Teboulle (2009);
+ Remark 3.1 on p. 191 (ISTA with backtracking)) or <code>less::gistCrit</code> (see Gong et al., 2013; Equation 3) </li>
+<li><code>sigma</code>: a <code>double</code> in (0,1) that is used by the gist convergence criterion. Larger sigma enforce larger improvement in fit</li>
+<li><code>stepSizeIn</code>: a <code>stepSizeInheritance</code> that specifies how step sizes should be carried forward from iteration to iteration. <code>less::initial</code>: resets the step size to L0 in each iteration, <code>less::istaStepInheritance</code>: takes the previous step size as initial value for the next iteration, <code>less::barzilaiBorwein</code>: uses the Barzilai-Borwein procedure, <code>less::stochasticBarzilaiBorwein</code>: uses the Barzilai-Borwein procedure, but sometimes resets the step size; this can help when the optimizer is caught in a bad spot.</li>
+<li><code>sampleSize</code>: an <code>int</code> that can be used to scale the fitting function down if the fitting function depends on the sample size</li>
+<li><code>verbose</code>: an <code>int</code>, where 0 prints no additional information, &gt; 0 prints GLMNET iterations</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">// First, create a new instance of class controlIsta:</span>
+<span class="n">less</span><span class="o">::</span><span class="n">controlIsta</span><span class="w"> </span><span class="n">controlOptimizer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">controlIstaDefault</span><span class="p">();</span>
+<span class="c1">// Next, adapt the settings:</span>
+<span class="n">controlOptimizer</span><span class="p">.</span><span class="n">maxIterOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<span class="c1">// pass the argument to the fitIsta function:</span>
+<span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">fitResult_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">fitIsta</span><span class="p">(</span>
+<span class="w">    </span><span class="n">linReg</span><span class="p">,</span>
+<span class="w">    </span><span class="n">startingValues</span><span class="p">,</span>
+<span class="w">    </span><span class="n">parameterLabels</span><span class="p">,</span>
+<span class="w">    </span><span class="n">penalty</span><span class="p">,</span>
+<span class="w">    </span><span class="n">lambda</span><span class="p">,</span>
+<span class="w">    </span><span class="n">theta</span><span class="p">,</span>
+<span class="w">    </span><span class="n">controlOptimizer</span><span class="c1">//,</span>
+<span class="w">    </span><span class="c1">// verbose // set to &gt;0 to get additional information on the optimization</span>
+<span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="specialized-interfaces">Specialized interfaces</h2>
+<p>If you are only interested in one specific penalty function (e.g., lasso), it can be beneficial to use the specialized interfaces provided by <strong>lesstimate</strong>.
+These can be faster because <strong>lesstimate</strong> no longer has to check which penalty is used for which parameter. That said, the specialized interface takes 
+some more time to set up and is less flexible than the simplified interface used above.</p>
+<p>To use the specialized interface, we have to define the penalties we want to use. In general,
+the specialized interface allows for specifying two penalties for each parameter: a smooth (i.e., differentiable) 
+penalty (currently only ridge is supported) and a non-smooth (i.e., non-differentiable) penalty (any of the penalties mentioned above). We will use 
+the elastic net below as this penalty combines a ridge and a lasso penalty.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">glmnet</label><label for="__tabbed_8_2">ista</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// Specify the penalties we want to use:</span>
+<span class="n">less</span><span class="o">::</span><span class="n">penaltyLASSOGlmnet</span><span class="w"> </span><span class="n">lasso</span><span class="p">;</span>
+<span class="n">less</span><span class="o">::</span><span class="n">penaltyRidgeGlmnet</span><span class="w"> </span><span class="n">ridge</span><span class="p">;</span>
+<span class="c1">// Note that we used the glmnet variants of lasso and ridge. The reason</span>
+<span class="c1">// for this is that the glmnet implementation allows for parameter-specific</span>
+<span class="c1">// lambda and alpha values while the current ista implementation does not.</span>
+
+<span class="c1">// These penalties take tuning parameters of class tuningParametersEnetGlmnet</span>
+<span class="n">less</span><span class="o">::</span><span class="n">tuningParametersEnetGlmnet</span><span class="w"> </span><span class="n">tp</span><span class="p">;</span>
+
+<span class="c1">// We have to specify alpha and lambda. Here, different values can </span>
+<span class="c1">// be specified for each parameter:</span>
+<span class="n">tp</span><span class="p">.</span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="p">(</span><span class="n">startingValues</span><span class="p">.</span><span class="n">n_elem</span><span class="p">);</span>
+<span class="n">tp</span><span class="p">.</span><span class="n">lambda</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.2</span><span class="p">);</span>
+<span class="n">tp</span><span class="p">.</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="p">(</span><span class="n">startingValues</span><span class="p">.</span><span class="n">n_elem</span><span class="p">);</span>
+<span class="n">tp</span><span class="p">.</span><span class="n">alpha</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">0.3</span><span class="p">);</span><span class="w"> </span>
+
+<span class="c1">// Finally, there is also the weights. The weights vector indicates, which</span>
+<span class="c1">// of the parameters is regularized (weight = 1) and which is unregularized </span>
+<span class="c1">// (weight =0). It also allows for adaptive lasso weights (e.g., weight =.0123).</span>
+<span class="c1">// weights must be an arma::rowvec of the same length as our parameter vector.</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="nf">weights</span><span class="p">(</span><span class="n">startingValues</span><span class="p">.</span><span class="n">n_elem</span><span class="p">);</span>
+<span class="n">weights</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span><span class="w"> </span><span class="c1">// we want to regularize all parameters</span>
+<span class="n">weights</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="c1">// except for the first one, which is our intercept.</span>
+<span class="n">tp</span><span class="p">.</span><span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">weights</span><span class="p">;</span><span class="w">   </span>
+
+<span class="c1">// to optimize this model, we have to pass it to</span>
+<span class="c1">// the glmnet function:</span>
+
+<span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">lmFit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">glmnet</span><span class="p">(</span>
+<span class="w">    </span><span class="n">linReg</span><span class="p">,</span><span class="w"> </span><span class="c1">// the first argument is our model</span>
+<span class="w">    </span><span class="n">startingValues</span><span class="p">,</span><span class="w"> </span><span class="c1">// arma::rowvec with starting values</span>
+<span class="w">    </span><span class="n">parameterLabels</span><span class="p">,</span><span class="w"> </span><span class="c1">// less::stringVector with labels</span>
+<span class="w">    </span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="c1">// non-smooth penalty</span>
+<span class="w">    </span><span class="n">ridge</span><span class="p">,</span><span class="w"> </span><span class="c1">// smooth penalty</span>
+<span class="w">    </span><span class="n">tp</span><span class="c1">//,    // tuning parameters</span>
+<span class="w">    </span><span class="c1">//controlOptimizer // optional fine-tuning (see above)</span>
+<span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1">// The elastic net is a combination of a ridge penalty and </span>
+<span class="c1">// a lasso penalty. </span>
+<span class="c1">// NOTE: HERE COMES THE BIGGEST DIFFERENCE BETWEEN GLMNET AND ISTA:</span>
+<span class="c1">// 1) ISTA ALSO REQUIRES THE DEFINITION OF A PROXIMAL OPERATOR. THESE</span>
+<span class="c1">//    ARE CALLED proximalOperatorZZZ IN lessSEM (e.g., proximalOperatorLasso </span>
+<span class="c1">//    for lasso).</span>
+<span class="c1">// 2) THE SMOOTH PENALTY (RIDGE) AND THE LASSO PENALTY MUST HAVE SEPARATE </span>
+<span class="c1">//    TUNING PARMAMETERS.</span>
+<span class="n">less</span><span class="o">::</span><span class="n">proximalOperatorLasso</span><span class="w"> </span><span class="n">proxOp</span><span class="p">;</span><span class="w"> </span><span class="c1">// HERE, WE DEFINE THE PROXIMAL OPERATOR</span>
+<span class="n">less</span><span class="o">::</span><span class="n">penaltyLASSO</span><span class="w"> </span><span class="n">lasso</span><span class="p">;</span><span class="w"> </span>
+<span class="n">less</span><span class="o">::</span><span class="n">penaltyRidge</span><span class="w"> </span><span class="n">ridge</span><span class="p">;</span>
+<span class="c1">// BOTH, LASSO AND RIDGE take tuning parameters of class tuningParametersEnet</span>
+<span class="n">less</span><span class="o">::</span><span class="n">tuningParametersEnet</span><span class="w"> </span><span class="n">tpLasso</span><span class="p">;</span>
+<span class="n">less</span><span class="o">::</span><span class="n">tuningParametersEnet</span><span class="w"> </span><span class="n">tpRidge</span><span class="p">;</span>
+
+<span class="c1">// We have to specify alpha and lambda. Here, the same value is used</span>
+<span class="c1">// for each parameter:</span>
+<span class="n">tpLasso</span><span class="p">.</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">.3</span><span class="p">;</span>
+<span class="n">tpLasso</span><span class="p">.</span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">.2</span><span class="p">;</span>
+<span class="n">tpRidge</span><span class="p">.</span><span class="n">alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">.3</span><span class="p">;</span>
+<span class="n">tpRidge</span><span class="p">.</span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">.2</span><span class="p">;</span>
+
+<span class="c1">// A weights vector indicates, which</span>
+<span class="c1">// of the parameters is regularized (weight = 1) and which is unregularized </span>
+<span class="c1">// (weight =0). It also allows for adaptive lasso weights (e.g., weight =.0123).</span>
+<span class="c1">// weights must be an arma::rowvec of the same length as our parameter vector.</span>
+<span class="n">arma</span><span class="o">::</span><span class="n">rowvec</span><span class="w"> </span><span class="nf">weights</span><span class="p">(</span><span class="n">startingValues</span><span class="p">.</span><span class="n">n_elem</span><span class="p">);</span>
+<span class="n">weights</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span><span class="w"> </span><span class="c1">// we want to regularize all parameters</span>
+<span class="n">weights</span><span class="p">.</span><span class="n">at</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="c1">// except for the first one, which is our intercept.</span>
+<span class="n">tpLasso</span><span class="p">.</span><span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">weights</span><span class="p">;</span>
+<span class="n">tpRidge</span><span class="p">.</span><span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">weights</span><span class="p">;</span>
+
+<span class="c1">// to optimize this model, we have to pass it to the ista function:</span>
+
+<span class="n">less</span><span class="o">::</span><span class="n">fitResults</span><span class="w"> </span><span class="n">lmFit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">less</span><span class="o">::</span><span class="n">ista</span><span class="p">(</span>
+<span class="w">  </span><span class="n">linReg</span><span class="p">,</span><span class="w"> </span><span class="c1">// the first argument is our model</span>
+<span class="w">  </span><span class="n">startingValues</span><span class="p">,</span><span class="w"> </span><span class="c1">// arma::rowvec with starting values</span>
+<span class="w">  </span><span class="n">parameterLabels</span><span class="p">,</span><span class="w"> </span><span class="c1">// less::stringVector with labels</span>
+<span class="w">  </span><span class="n">proxOp</span><span class="p">,</span><span class="w"> </span><span class="c1">// proximal opertator</span>
+<span class="w">  </span><span class="n">lasso</span><span class="p">,</span><span class="w"> </span><span class="c1">// our lasso penalty</span>
+<span class="w">  </span><span class="n">ridge</span><span class="p">,</span><span class="w"> </span><span class="c1">// our ridge penalty</span>
+<span class="w">  </span><span class="n">tpLasso</span><span class="p">,</span><span class="w"> </span><span class="c1">// our tuning parameter FOR THE LASSO PENALTY</span>
+<span class="w">  </span><span class="n">tpRidge</span><span class="c1">//, // our tuning parameter FOR THE RIDGE PENALTY</span>
+<span class="w">  </span><span class="c1">//controlOptimizer // optional fine-tuning (see above)</span>
+<span class="p">);</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="references">References</h2>
+<ul>
+<li>Sanderson C, Curtin R (2016). Armadillo: a template-based C++ library for linear algebra. Journal of Open Source Software, 1 (2), pp. 26.</li>
+<li>Eddelbuettel D, François R (2011). “Rcpp: Seamless R and C++ Integration.” Journal of Statistical Software, 40(8), 1–18. doi:10.18637/jss.v040.i08. </li>
+<li>Eddelbuettel D, Sanderson C (2014). “RcppArmadillo: Accelerating R with high-performance C++ linear algebra.” Computational Statistics and Data Analysis, 71, 1054–1063. doi:10.1016/j.csda.2013.02.005. </li>
+<li>Curtin R R, Edel M, Prabhu R G, Basak S, Lou Z, Sanderson C (2021). The ensmallen library for flexible numerical optimization. Journal of Machine Learning Research, 22 (166).</li>
+</ul>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.74e28a9f.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.220ee61c.min.js"></script>
+      
+        
+          <script src="../javascripts/katex.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js"></script>
+        
+      
+        
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js"></script>
+        
+      
+    
+  </body>
+</html>
